@@ -1,0 +1,60 @@
+{
+    "name": "carmelosantana/coqui-toolkit-doom-generator",
+    "description": "Doom mod generation toolkit for Coqui — WAD parsing, project scaffolding, DeuTex build orchestration, and source port launching",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carmelo Santana"
+        }
+    ],
+    "keywords": [
+        "php-agents",
+        "doom",
+        "wad",
+        "modding",
+        "game-generation",
+        "deutex",
+        "coqui",
+        "toolkit"
+    ],
+    "require": {
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "carmelosantana/php-agents": "^0.7",
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CarmeloSantana\\CoquiToolkitDoomGenerator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CarmeloSantana\\CoquiToolkitDoomGenerator\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "analyse": "phpstan analyse"
+    },
+    "extra": {
+        "php-agents": {
+            "toolkits": [
+                "CarmeloSantana\\CoquiToolkitDoomGenerator\\DoomGeneratorToolkit"
+            ],
+            "description": "Doom mod generation — WAD parsing, project scaffolding, DeuTex build orchestration, Freedoom IWAD management, and source port launching"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
