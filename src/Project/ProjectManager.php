@@ -34,7 +34,7 @@ final class ProjectManager
     /**
      * Initialize a new mod project with standard directory structure.
      *
-     * @param array{iwad?: string, source_port?: string, description?: string} $options
+     * @param array{iwad?: string, source_port?: string, description?: string, coqui_project_id?: string} $options
      * @return array{name: string, path: string, manifest: array<string, mixed>}
      * @throws DoomGeneratorException If the project already exists.
      */
@@ -70,6 +70,7 @@ final class ProjectManager
             'description' => $options['description'] ?? '',
             'iwad' => $options['iwad'] ?? 'freedoom2.wad',
             'source_port' => $options['source_port'] ?? 'gzdoom',
+            'coqui_project_id' => $options['coqui_project_id'] ?? null,
             'created' => date('c'),
             'last_build' => null,
             'build_count' => 0,

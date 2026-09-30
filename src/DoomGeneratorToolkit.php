@@ -87,14 +87,38 @@ final class DoomGeneratorToolkit implements ToolkitInterface
             | Playtest a mod | `doom_run` | Launch a built mod in GZDoom/Chocolate Doom |
             | Manage toolchain | `doom_toolchain` | Check tool availability, install Freedoom IWADs |
 
-            ### Typical Workflow
+            ### Recommended Workflow (Coqui-Integrated)
 
-            1. **Check toolchain:** `doom_toolchain(action: "status")` — verify DeuTex and source ports are installed
-            2. **Get Freedoom:** `doom_toolchain(action: "install_freedoom")` — download free IWAD if needed
-            3. **Create project:** `doom_project(action: "init", name: "my-mod", source_port: "gzdoom")`
-            4. **Add assets:** `doom_asset(action: "add", project: "my-mod", file_path: "...", category: "graphic")`
-            5. **Build WAD:** `doom_build(project: "my-mod")`
-            6. **Playtest:** `doom_run(project: "my-mod")`
+            Doom mod projects integrate with Coqui's project, sprint, and artifact system for structured development:
+
+            1. **Create a Coqui project:** `project_create(title: "My Doom Mod", slug: "my-doom-mod")`
+            2. **Set it active:** `/projects my-doom-mod` — injects context into all agent prompts
+            3. **Plan sprints:** Create one sprint per milestone:
+               - `sprint_create(project_id: "...", title: "Core Assets", acceptance_criteria: '["Wall textures added", "Enemy sprites created", "Sound effects present"]')`
+               - `sprint_create(project_id: "...", title: "First Playable Build", acceptance_criteria: '["PWAD builds without errors", "Mod loads in GZDoom", "Custom assets visible in-game"]')`
+            4. **Check toolchain:** `doom_toolchain(action: "status")` — verify DeuTex and source ports
+            5. **Get Freedoom:** `doom_toolchain(action: "install_freedoom")` — download free IWAD if needed
+            6. **Init mod project:** `doom_project(action: "init", name: "my-doom-mod", project_id: "<coqui_project_id>")` — links to Coqui project
+            7. **Add assets:** `doom_asset(action: "add", project: "my-doom-mod", file_path: "...", category: "graphic")`
+            8. **Build WAD:** `doom_build(project: "my-doom-mod")` — response includes `coqui_project_id` for artifact tracking
+            9. **Track builds as artifacts:** `artifact_create(type: "data", project_id: "...", sprint_id: "...", title: "my-doom-mod.wad build #1")`
+            10. **Review sprint:** `sprint_transition(id: "...", status: "review")` when acceptance criteria are met
+            11. **Playtest:** `doom_run(project: "my-doom-mod")`
+
+            For automated multi-stage development, use loops:
+            ```
+            loop_start(definition: "harness", goal: "Create a Doom mod with custom wall textures and enemy sprites", project_slug: "my-doom-mod")
+            ```
+
+            ### Standalone Workflow (Quick Start)
+
+            For quick one-off mods without project tracking:
+
+            1. `doom_toolchain(action: "status")`
+            2. `doom_project(action: "init", name: "quick-mod")`
+            3. `doom_asset(action: "add", project: "quick-mod", ...)`
+            4. `doom_build(project: "quick-mod")`
+            5. `doom_run(project: "quick-mod")`
 
             ### Project Structure
 
@@ -135,9 +159,11 @@ final class DoomGeneratorToolkit implements ToolkitInterface
             ### Best Practices
 
             - Always start with `doom_toolchain(action: "status")` in a new session
+            - Link mod projects to Coqui projects (`project_id` param) for sprint/artifact tracking
             - Use `doom_wad_inspect` to study existing WADs for reference
             - Keep lump names ≤ 8 characters, uppercase, alphanumeric + underscore
             - Use `doom_project(action: "info")` to check project status before building
+            - Track each successful build as an artifact for versioning
             - Build and test frequently — small iterative changes work best
             - Freedoom provides a full set of replacement assets for all Doom II content
             </DOOM-GENERATOR-GUIDELINES>

@@ -53,17 +53,6 @@ final readonly class DoomBuildTool
             return ToolResult::error($e->getMessage());
         }
 
-        // Verify deutex is available
-        $toolchain = $this->runner->checkToolchain();
-        if (!($toolchain['deutex']['available'] ?? false)) {
-            return ToolResult::error(
-                'DeuTex is not installed. Use doom_toolchain action "status" to check requirements, then install DeuTex:\n'
-                . '  Ubuntu/Debian: sudo apt install deutex\n'
-                . '  macOS: brew install deutex\n'
-                . '  Source: https://github.com/Doom-Utils/deutex'
-            );
-        }
-
         // Build output path
         $buildDir = $projectPath . '/build';
         if (!is_dir($buildDir)) {
@@ -85,26 +74,16 @@ final readonly class DoomBuildTool
             $this->projects->generateDeutexConfig($projectPath);
         }
 
-        // Read manifest for IWAD path
-        $manifestPath = $projectPath . '/project.json';
-        $manifest = [];
-        if (is_file($manifestPath)) {
-            $data = file_get_contents($manifestPath);
-            if ($data !== false) {
-                $manifest = json_decode($data, true) ?: [];
-            }
-        }
-
         // Build DeuTex arguments
         $args = ['-doom2', 'bootstrap', '-out', $outputPath, '-dir', $projectPath];
 
-        // Run deutex
+        // Run deutex — returns install instructions on error if binary is missing
         $result = $this->runner->deutex($args, $projectPath);
 
         if ($result->succeeded()) {
-            // Record the build
             $this->projects->recordBuild($projectPath);
 
+            $manifest = $this->projects->readManifest($projectPath);
             $wadSize = is_file($outputPath) ? filesize($outputPath) : 0;
 
             return ToolResult::success(json_encode([
@@ -113,6 +92,7 @@ final readonly class DoomBuildTool
                 'output' => $outputPath,
                 'size' => $wadSize,
                 'size_human' => $this->formatSize($wadSize ?: 0),
+                'coqui_project_id' => $manifest['coqui_project_id'] ?? null,
                 'log' => $result->output(),
             ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?: '{}');
         }

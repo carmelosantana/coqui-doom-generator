@@ -10,6 +10,7 @@ use CarmeloSantana\PHPAgents\Tool\Parameter\StringParameter;
 use CarmeloSantana\PHPAgents\Tool\Tool;
 use CarmeloSantana\PHPAgents\Tool\ToolResult;
 use CarmeloSantana\CoquiToolkitDoomGenerator\Exception\DoomGeneratorException;
+use CarmeloSantana\CoquiToolkitDoomGenerator\Support\PathGuard;
 use CarmeloSantana\CoquiToolkitDoomGenerator\Wad\WadReader;
 
 /**
@@ -48,7 +49,11 @@ final readonly class DoomWadInspectTool
             return ToolResult::error('The "path" parameter is required.');
         }
 
-        $absolutePath = $this->resolvePath($path);
+        try {
+            $absolutePath = PathGuard::resolve($path, $this->workspacePath);
+        } catch (DoomGeneratorException $e) {
+            return ToolResult::error($e->getMessage());
+        }
 
         try {
             $reader = new WadReader($absolutePath);
@@ -90,17 +95,5 @@ final readonly class DoomWadInspectTool
         }
 
         return ToolResult::success(json_encode($output, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?: '{}');
-    }
-
-    private function resolvePath(string $relativePath): string
-    {
-        $absolute = $this->workspacePath . '/' . ltrim($relativePath, '/\\');
-
-        $realDir = realpath(dirname($absolute));
-        if ($realDir !== false && !str_starts_with($realDir, $this->workspacePath)) {
-            throw DoomGeneratorException::pathEscapesSandbox($relativePath);
-        }
-
-        return $absolute;
     }
 }

@@ -42,6 +42,7 @@ Create and manage mod projects with standardized directory structure.
 | `name` | string | Conditional | Project name (required for `init`, `info`) |
 | `iwad` | string | No | Target IWAD name (default: `freedoom2.wad`) |
 | `source_port` | string | No | Target source port (default: `gzdoom`) |
+| `project_id` | string | No | Coqui project ID to link for sprint/artifact tracking |
 
 ### `doom_asset`
 
@@ -106,6 +107,8 @@ src/
 │   ├── DoomRunTool.php
 │   ├── DoomToolchainTool.php
 │   └── DoomWadInspectTool.php
+├── Support/
+│   └── PathGuard.php             # Sandbox path validation
 └── Wad/
     ├── WadHeader.php             # Header value object
     ├── WadLump.php               # Lump directory entry VO
