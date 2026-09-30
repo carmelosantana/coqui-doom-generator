@@ -155,17 +155,8 @@ final readonly class DoomRunTool
             return '';
         }
 
-        $manifestPath = $projectPath . '/project.json';
-        if (!is_file($manifestPath)) {
-            return '';
-        }
+        $manifest = $this->projects->readManifest($projectPath);
 
-        $data = file_get_contents($manifestPath);
-        if ($data === false) {
-            return '';
-        }
-
-        $manifest = json_decode($data, true);
         return (string) ($manifest['iwad'] ?? '');
     }
 }

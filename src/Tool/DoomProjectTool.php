@@ -32,6 +32,7 @@ final readonly class DoomProjectTool
                 new StringParameter('iwad', 'Target IWAD name (default: freedoom2.wad). Used with init.', required: false),
                 new EnumParameter('source_port', 'Target source port. Used with init.', ['gzdoom', 'chocolate-doom', 'dsda-doom'], required: false),
                 new StringParameter('description', 'Project description. Used with init.', required: false),
+                new StringParameter('project_id', 'Coqui project ID to link this mod project to a Coqui project for sprint/artifact tracking. Used with init.', required: false),
             ],
             callback: fn(array $input): ToolResult => $this->execute($input),
         );
@@ -72,6 +73,9 @@ final readonly class DoomProjectTool
         if (isset($input['description'])) {
             $options['description'] = (string) $input['description'];
         }
+        if (isset($input['project_id'])) {
+            $options['coqui_project_id'] = (string) $input['project_id'];
+        }
 
         try {
             $result = $this->projects->init($name, $options);
@@ -85,6 +89,7 @@ final readonly class DoomProjectTool
             'path' => $result['path'],
             'iwad' => $result['manifest']['iwad'],
             'source_port' => $result['manifest']['source_port'],
+            'coqui_project_id' => $result['manifest']['coqui_project_id'] ?? null,
             'directories' => ['graphics', 'sprites', 'flats', 'sounds', 'music', 'patches', 'scripts', 'lumps', 'build'],
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) ?: '{}');
     }
